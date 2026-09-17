@@ -4,8 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>កម្មវិធីបង្កើតរបាយការណ៍ប្រចាំបញ្ជា</title>
+    
+    <!-- PWA Settings សម្រាប់កំណត់ឱ្យវាដំណើរការជា App -->
+    <meta name="theme-color" content="#1a365d">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="របាយការណ៍">
+    <link rel="apple-touch-icon" href="image1.jpg">
+    <link rel="icon" type="image/jpeg" href="image1.jpg">
+    
+    <!-- Web App Manifest Dynamic Data -->
+    <link rel="manifest" id="manifestPlaceholder">
+
     <!-- ទាញយកបណ្ណាល័យ momentkh សម្រាប់គណនាថ្ងៃចន្ទគតិខ្មែរ -->
     <script src="https://cdn.jsdelivr.net/gh/ThyrithSor/momentkh@3.0.3/momentkh.js"></script>
+    
     <style>
         body {
             font-family: 'Khmer OS Battambang', 'Kantumruy Pro', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -22,7 +35,6 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        /* ផ្នែក Header និង Logo */
         .app-header {
             text-align: center;
             margin-bottom: 20px;
@@ -30,7 +42,7 @@
         .app-logo {
             width: 110px;
             height: 110px;
-            object-fit: contain;
+            object-fit: cover;
             border-radius: 50%;
             margin-bottom: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
@@ -103,8 +115,16 @@
         .btn-copy:hover {
             background-color: #2f855a;
         }
+        .btn-install {
+            background-color: #d69e2e;
+            color: white;
+            display: none;
+            margin-bottom: 15px;
+        }
+        .btn-install:hover {
+            background-color: #b7791f;
+        }
 
-        /* ទីតាំង Toast ឱ្យនៅចំកណ្តាលអេក្រង់ */
         .toast {
             visibility: hidden;
             min-width: 250px;
@@ -139,7 +159,6 @@
             color: #1a365d;
         }
 
-        /* Animation សម្រាប់ Toast */
         @keyframes fadeInOut {
             0% { opacity: 0; transform: translate(-50%, -40%); }
             15% { opacity: 1; transform: translate(-50%, -50%); }
@@ -151,7 +170,8 @@
 <body>
 
 <div class="container">
-    <!-- បង្ហាញ Logo នៅផ្នែកខាងលើ -->
+    <button id="installBtn" class="btn-install" onclick="installApp()">📲 ដំឡើងកម្មវិធីនេះលើទូរស័ព្ទ/កុំព្យូទ័រ (Install App)</button>
+
     <div class="app-header">
         <img src="image1.jpg" alt="App Logo" class="app-logo">
         <h2>📝 កម្មវិធីបង្កើតរបាយការណ៍ប្រចាំបញ្ជា</h2>
@@ -172,7 +192,6 @@
         </div>
     </div>
 
-    <!-- កន្លែងជ្រើសរើស ថ្ងៃ ខែ ឆ្នាំ (Date Picker) -->
     <div class="row">
         <div class="form-group" style="flex: 0.4;">
             <label for="datePicker">ជ្រើសរើសថ្ងៃខែឆ្នាំ៖</label>
@@ -184,7 +203,6 @@
         </div>
     </div>
 
-    <!-- ប្រអប់ចំនួនកម្លាំង ទាំង ៣ រៀបជួរស្មើគ្នា -->
     <div class="row">
         <div class="form-group">
             <label for="totalForce">កម្លាំងមានមុខជាក់ស្ដែង (រូប)៖</label>
@@ -226,7 +244,6 @@
         <button class="btn-copy" onclick="copyReport()">📋 ចម្លង (Copy) របាយការណ៍</button>
     </div>
 
-    <!-- កន្លែងដាក់ License ម្ចាស់កម្មវិធី -->
     <div class="app-license">
         🛡️ រក្សាសិទ្ធិគ្រប់យ៉ាង © <strong>បង្កើតដោយ៖ កែវ រតនា (ការិយាល័យអក្សរសម្ងាត់)</strong>
     </div>
@@ -235,6 +252,44 @@
 <div id="toast" class="toast">បានចម្លងរបាយការណ៍រួចរាល់!</div>
 
 <script>
+    // បង្កើត Manifest Dynamic ដើម្បីអោយ Browser ស្គាល់ថាជា App
+    const manifestData = {
+        "name": "កម្មវិធីបង្កើតរបាយការណ៍ប្រចាំបញ្ជា",
+        "short_name": "របាយការណ៍",
+        "start_url": ".",
+        "display": "standalone",
+        "background_color": "#ffffff",
+        "theme_color": "#1a365d",
+        "icons": [{
+            "src": "image1.jpg",
+            "sizes": "192x192 512x512",
+            "type": "image/jpeg"
+        }]
+    };
+    const stringManifest = JSON.stringify(manifestData);
+    const blob = new Blob([stringManifest], {type: 'application/json'});
+    const manifestURL = URL.createObjectURL(blob);
+    document.getElementById('manifestPlaceholder').setAttribute('href', manifestURL);
+
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('installBtn').style.display = 'block';
+    });
+
+    function installApp() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    document.getElementById('installBtn').style.display = 'none';
+                }
+                deferredPrompt = null;
+            });
+        }
+    }
+
     const khmerMonths = ["មករា", "កុម្ភៈ", "មីនា", "មេសា", "ឧសភា", "មិថុនា", "កក្កដា", "សីហា", "កញ្ញា", "តុលា", "វិច្ឆិកា", "ធ្នូ"];
     const khmerNumbers = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
 
@@ -243,16 +298,13 @@
         return num.toString().split('').map(n => khmerNumbers[n] || n).join('');
     }
 
-    // បំប្លែងថ្ងៃខែទៅជាអត្ថបទចន្ទគតិខ្មែរ
     function getKhmerDateString(selectedDate) {
         let lunarStr = "";
-        
         if (typeof momentkh !== 'undefined') {
             const year = selectedDate.getFullYear();
             const month = selectedDate.getMonth();
             const day = selectedDate.getDate();
             const localDate = new Date(year, month, day, 12, 0, 0); 
-            
             const khmerObj = momentkh.fromDate(localDate);
             lunarStr = momentkh.format(khmerObj);
         } else {
@@ -266,7 +318,6 @@
         return `${lunarStr} ត្រូវនឹងថ្ងៃទី${solarDay} ខែ${solarMonth} ឆ្នាំ${solarYear}`;
     }
 
-    // អនុវត្តនៅពេលអ្នកប្រើប្រាស់ជ្រើសរើសថ្ងៃខែពី Date Picker
     function updateKhmerDate() {
         const pickerVal = document.getElementById('datePicker').value;
         if (pickerVal) {
@@ -277,11 +328,9 @@
         }
     }
 
-    // ស្វ័យប្រវត្តិប្តូរម៉ោងតាមជម្រើស ពេល
     function autoFillTime() {
         const shift = document.getElementById('shiftTime').value;
         const timeInput = document.getElementById('timeText');
-        
         if (shift === 'ព្រឹក') {
             timeInput.value = '០៨និង ០០នាទី';
         } else if (shift === 'រសៀល') {
@@ -291,7 +340,6 @@
         }
     }
 
-    // គណនាកម្លាំងការិយាល័យស្វ័យប្រវត្តិ
     function calculateDeptForce() {
         const total = parseInt(document.getElementById('totalForce').value) || 0;
         const deputy = parseInt(document.getElementById('deputyChief').value) || 0;
@@ -299,7 +347,6 @@
         document.getElementById('deptForce').value = dept > 0 ? dept : 0;
     }
 
-    // បង្កើតអត្ថបទរបាយការណ៍
     function generateReport() {
         const shift = document.getElementById('shiftTime').value;
         const timeText = document.getElementById('timeText').value;
@@ -332,13 +379,11 @@
         document.getElementById('reportOutput').value = reportTemplate;
     }
 
-    // ចម្លងអត្ថបទទៅ Clipboard
     function copyReport() {
         const reportArea = document.getElementById('reportOutput');
         if (!reportArea.value) {
             generateReport();
         }
-        
         reportArea.select();
         reportArea.setSelectionRange(0, 99999);
 
@@ -360,14 +405,12 @@
         setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
     }
 
-    // កំណត់តម្លៃថ្ងៃនេះ (Default) ពេលបើកកម្មវិធីដំបូង
     window.onload = function() {
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         document.getElementById('datePicker').value = `${year}-${month}-${day}`;
-        
         document.getElementById('dateText').value = getKhmerDateString(now);
         generateReport();
     };
