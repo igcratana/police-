@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>កម្មវិធីបង្កើតរបាយការណ៍ប្រចាំបញ្ជា</title>
+    <!-- ទាញយកបណ្ណាល័យ momentkh សម្រាប់គណនាថ្ងៃចន្ទគតិខ្មែរ -->
+    <script src="https://cdn.jsdelivr.net/gh/ThyrithSor/momentkh@3.0.3/momentkh.js"></script>
+    <style>
+        body {
+            font-family: 'Khmer OS Battambang', 'Kantumruy Pro', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #1a365d;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        select, input[type="text"], input[type="number"], input[type="date"], textarea {
+            width: 100%;
+            height: 42px;
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        .row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        .row .form-group {
+            flex: 1;
+            margin-bottom: 15px;
+        }
+        textarea {
+            height: 220px !important;
+            resize: vertical;
+            background-color: #fcfcfc;
+            line-height: 1.6;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-generate {
+            background-color: #2b6cb0;
+            color: white;
+        }
+        .btn-generate:hover {
+            background-color: #2c5282;
+        }
+        .btn-copy {
+            background-color: #38a169;
+            color: white;
+        }
+        .btn-copy:hover {
+            background-color: #2f855a;
+        }
+        .toast {
+            visibility: hidden;
+            min-width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 10px;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+        .toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+        .app-license {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px dashed #cbd5e0;
+            text-align: center;
+            font-size: 13px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        .app-license strong {
+            color: #1a365d;
+        }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📝 កម្មវិធីបង្កើតរបាយការណ៍ប្រចាំបញ្ជា</h2>
+    
+    <div class="row">
+        <div class="form-group">
+            <label for="shiftTime">ជ្រើសរើសពេល៖</label>
+            <select id="shiftTime" onchange="autoFillTime()">
+                <option value="ព្រឹក">នាព្រឹក</option>
+                <option value="រសៀល">នារសៀល</option>
+                <option value="យប់">នាយប់</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="timeText">វេលាម៉ោង៖</label>
+            <input type="text" id="timeText" value="០៨និង ០០នាទី">
+        </div>
+    </div>
+
+    <!-- កន្លែងជ្រើសរើស ថ្ងៃ ខែ ឆ្នាំ (Date Picker) -->
+    <div class="row">
+        <div class="form-group" style="flex: 0.4;">
+            <label for="datePicker">ជ្រើសរើសថ្ងៃខែឆ្នាំ៖</label>
+            <input type="date" id="datePicker" onchange="updateKhmerDate()">
+        </div>
+        <div class="form-group" style="flex: 0.6;">
+            <label for="dateText">កាលបរិច្ឆេទចន្ទគតិ (ស្វ័យប្រវត្តិ)៖</label>
+            <input type="text" id="dateText" value="">
+        </div>
+    </div>
+
+    <!-- ប្រអប់ចំនួនកម្លាំង ទាំង ៣ រៀបជួរស្មើគ្នា -->
+    <div class="row">
+        <div class="form-group">
+            <label for="totalForce">កម្លាំងមានមុខជាក់ស្ដែង (រូប)៖</label>
+            <input type="number" id="totalForce" value="23" oninput="calculateDeptForce()">
+        </div>
+        <div class="form-group">
+            <label for="deputyChief">ស្នងការរង (រូប)៖</label>
+            <input type="number" id="deputyChief" value="1" oninput="calculateDeptForce()">
+        </div>
+        <div class="form-group">
+            <label for="deptForce">កម្លាំងការិ. សរុប (រូប)៖</label>
+            <input type="number" id="deptForce" value="22">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group">
+            <label for="receiverName">ឈ្មោះលោកឧត្តមសេនីយ៍ត្រី (អ្នកទទួល)៖</label>
+            <input type="text" id="receiverName" value="ជា ចិត្រា">
+        </div>
+        <div class="form-group">
+            <label for="senderName">ឈ្មោះលោកឧត្តមសេនីយ៍ត្រី (អ្នករាយការណ៍)៖</label>
+            <input type="text" id="senderName" value="កែវ រតនា">
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-generate" onclick="generateReport()">បង្កើតរបាយការណ៍</button>
+    </div>
+
+    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+    <div class="form-group">
+        <label for="reportOutput">លទ្ធផលរបាយការណ៍ (អាចកែប្រែបន្ថែមក្នុងប្រអប់នេះបាន)៖</label>
+        <textarea id="reportOutput"></textarea>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-copy" onclick="copyReport()">📋 ចម្លង (Copy) របាយការណ៍</button>
+    </div>
+
+    <!-- កន្លែងដាក់ License ម្ចាស់កម្មវិធី -->
+    <div class="app-license">
+        🛡️ រក្សាសិទ្ធិគ្រប់យ៉ាង © <strong>បង្កើតដោយ៖ កែវ រតនា (ការិយាល័យអក្សរសម្ងាត់)</strong>
+    </div>
+</div>
+
+<div id="toast" class="toast">បានចម្លងរបាយការណ៍រួចរាល់!</div>
+
+<script>
+    const khmerMonths = ["មករា", "កុម្ភៈ", "មីនា", "មេសា", "ឧសភា", "មិថុនា", "កក្កដា", "សីហា", "កញ្ញា", "តុលា", "វិច្ឆិកា", "ធ្នូ"];
+    const khmerNumbers = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+
+    function toKhmerNum(num) {
+        if (num === undefined || num === null) return '';
+        return num.toString().split('').map(n => khmerNumbers[n] || n).join('');
+    }
+
+    // បំប្លែងថ្ងៃខែទៅជាអត្ថបទចន្ទគតិខ្មែរ
+    function getKhmerDateString(selectedDate) {
+        let lunarStr = "";
+        
+        if (typeof momentkh !== 'undefined') {
+            const year = selectedDate.getFullYear();
+            const month = selectedDate.getMonth();
+            const day = selectedDate.getDate();
+            const localDate = new Date(year, month, day, 12, 0, 0); 
+            
+            const khmerObj = momentkh.fromDate(localDate);
+            lunarStr = momentkh.format(khmerObj);
+        } else {
+            lunarStr = "ថ្ងៃសៅរ៍ ១កើត ខែភទ្របទ ឆ្នាំមមី អដ្ឋស័ក ពុទ្ធសករាជ ២៥៧០";
+        }
+
+        const solarDay = toKhmerNum(selectedDate.getDate());
+        const solarMonth = khmerMonths[selectedDate.getMonth()];
+        const solarYear = toKhmerNum(selectedDate.getFullYear());
+
+        return `${lunarStr} ត្រូវនឹងថ្ងៃទី${solarDay} ខែ${solarMonth} ឆ្នាំ${solarYear}`;
+    }
+
+    // អនុវត្តនៅពេលអ្នកប្រើប្រាស់ជ្រើសរើសថ្ងៃខែពី Date Picker
+    function updateKhmerDate() {
+        const pickerVal = document.getElementById('datePicker').value;
+        if (pickerVal) {
+            const parts = pickerVal.split('-');
+            const d = new Date(parts[0], parts[1] - 1, parts[2]);
+            document.getElementById('dateText').value = getKhmerDateString(d);
+            generateReport();
+        }
+    }
+
+    // ស្វ័យប្រវត្តិប្តូរម៉ោងតាមជម្រើស ពេល
+    function autoFillTime() {
+        const shift = document.getElementById('shiftTime').value;
+        const timeInput = document.getElementById('timeText');
+        
+        if (shift === 'ព្រឹក') {
+            timeInput.value = '០៨និង ០០នាទី';
+        } else if (shift === 'រសៀល') {
+            timeInput.value = '១៤និង ០០នាទី';
+        } else if (shift === 'យប់') {
+            timeInput.value = '២០និង ០០នាទី';
+        }
+    }
+
+    // គណនាកម្លាំងការិយាល័យស្វ័យប្រវត្តិ
+    function calculateDeptForce() {
+        const total = parseInt(document.getElementById('totalForce').value) || 0;
+        const deputy = parseInt(document.getElementById('deputyChief').value) || 0;
+        const dept = total - deputy;
+        document.getElementById('deptForce').value = dept > 0 ? dept : 0;
+    }
+
+    // បង្កើតអត្ថបទរបាយការណ៍ (បានសម្រួល Space ខាងដើមបន្ទាត់ចេញ)
+    function generateReport() {
+        const shift = document.getElementById('shiftTime').value;
+        const timeText = document.getElementById('timeText').value;
+        const dateText = document.getElementById('dateText').value;
+        const totalForce = toKhmerNum(document.getElementById('totalForce').value);
+        const deputyChief = toKhmerNum(document.getElementById('deputyChief').value);
+        const deptForce = toKhmerNum(document.getElementById('deptForce').value);
+        const receiverName = document.getElementById('receiverName').value;
+        const senderName = document.getElementById('senderName').value;
+
+        const reportTemplate = `🇰🇭.🚔ប្រចាំបញ្ជា វេនទី ២
+
+🙏សូមគោរពរាយការណ៍ជូន លោកឧត្តមសេនីយ៍ត្រី ${receiverName} ស្នងការនគរបាលខេត្តមណ្ឌលគិរី មេត្តាជូនជ្រាបដ៏ខ្ពង់ខ្ពស់។
+
+នា${shift} ${dateText}
+វេលាម៉ោង ${timeText}។
+
+🇰🇭🚔.នៅស្នងការដ្ឋាននគរបាលខេត្ត បានប្រជុំជួរត្រួតពិនិត្យកម្លាំងប្រចាំបញ្ជា វេនទី (២B)វិលជុំ ៖
+🔹កម្លាំងមានមុខជាក់ស្ដែងសរុប ចំនួន ${totalForce}រូប ។
+🔹ស្នងការរង ចំនួន ${deputyChief}រូប ៖
+🔹កម្លាំងការិ. សរុបចំនួន ${deptForce}រូប ។
+
+🙏អាស្រ័យហេតុនេះសូមគោរព ជូន
+លោកស្នងការ មេត្តាជ្រាប ដោយក្ដីគោរព ។
+
+ឧត្តមសេនីយ៍ត្រី ${senderName}`;
+
+        document.getElementById('reportOutput').value = reportTemplate;
+    }
+
+    // ចម្លងអត្ថបទទៅ Clipboard
+    function copyReport() {
+        const reportArea = document.getElementById('reportOutput');
+        if (!reportArea.value) {
+            generateReport();
+        }
+        
+        reportArea.select();
+        reportArea.setSelectionRange(0, 99999);
+
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                showToast();
+            } else {
+                alert("មិនអាច Copy បានទេ សូមជ្រើសរើសអត្ថបទហើយ Copy ដោយផ្ទាល់!");
+            }
+        } catch (err) {
+            alert("សូមជ្រើសរើសអត្ថបទ និងចុច Copy ដោយផ្ទាល់!");
+        }
+    }
+
+    function showToast() {
+        const toast = document.getElementById('toast');
+        toast.className = "toast show";
+        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+    }
+
+    // កំណត់តម្លៃថ្ងៃនេះ (Default) ពេលបើកកម្មវិធីដំបូង
+    window.onload = function() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        document.getElementById('datePicker').value = `${year}-${month}-${day}`;
+        
+        document.getElementById('dateText').value = getKhmerDateString(now);
+        generateReport();
+    };
+</script>
+
+</body>
+</html>
