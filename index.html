@@ -90,24 +90,29 @@
         .btn-copy:hover {
             background-color: #2f855a;
         }
+        
+        /* កែប្រែ Toast ឱ្យបង្ហាញនៅចំកណ្តាលអេក្រង់ */
         .toast {
             visibility: hidden;
-            min-width: 200px;
-            background-color: #333;
+            min-width: 250px;
+            background-color: rgba(51, 51, 51, 0.95);
             color: #fff;
             text-align: center;
-            border-radius: 4px;
-            padding: 10px;
+            border-radius: 8px;
+            padding: 16px 24px;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             position: fixed;
-            bottom: 30px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            z-index: 1;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
         }
         .toast.show {
             visibility: visible;
-            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+            animation: fadeInOut 3s forwards;
         }
+
         .app-license {
             margin-top: 25px;
             padding-top: 15px;
@@ -120,8 +125,13 @@
         .app-license strong {
             color: #1a365d;
         }
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -40%); }
+            15% { opacity: 1; transform: translate(-50%, -50%); }
+            85% { opacity: 1; transform: translate(-50%, -50%); }
+            100% { opacity: 0; transform: translate(-50%, -60%); }
+        }
     </style>
 </head>
 <body>
@@ -271,7 +281,7 @@
         document.getElementById('deptForce').value = dept > 0 ? dept : 0;
     }
 
-    // បង្កើតអត្ថបទរបាយការណ៍ (បានកែសម្រួលការចុះបន្ទាត់ត្រង់ឈ្មោះអ្នកទទួល)
+    // បង្កើតអត្ថបទរបាយការណ៍
     function generateReport() {
         const shift = document.getElementById('shiftTime').value;
         const timeText = document.getElementById('timeText').value;
