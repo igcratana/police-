@@ -22,10 +22,23 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
+        /* ផ្នែក Header និង Logo */
+        .app-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .app-logo {
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
         h2 {
             text-align: center;
             color: #1a365d;
-            margin-bottom: 20px;
+            margin: 0 0 20px 0;
         }
         .form-group {
             margin-bottom: 15px;
@@ -90,8 +103,8 @@
         .btn-copy:hover {
             background-color: #2f855a;
         }
-        
-        /* កែប្រែ Toast ឱ្យបង្ហាញនៅចំកណ្តាលអេក្រង់ */
+
+        /* ទីតាំង Toast ឱ្យនៅចំកណ្តាលអេក្រង់ */
         .toast {
             visibility: hidden;
             min-width: 250px;
@@ -126,6 +139,7 @@
             color: #1a365d;
         }
 
+        /* Animation សម្រាប់ Toast */
         @keyframes fadeInOut {
             0% { opacity: 0; transform: translate(-50%, -40%); }
             15% { opacity: 1; transform: translate(-50%, -50%); }
@@ -137,7 +151,11 @@
 <body>
 
 <div class="container">
-    <h2>📝 កម្មវិធីបង្កើតរបាយការណ៍ប្រចាំបញ្ជា</h2>
+    <!-- បង្ហាញ Logo នៅផ្នែកខាងលើ -->
+    <div class="app-header">
+        <img src="image1.jpg" alt="App Logo" class="app-logo">
+        <h2>📝 កម្មវិធីបង្កើតរបាយការណ៍ប្រចាំបញ្ជា</h2>
+    </div>
     
     <div class="row">
         <div class="form-group">
