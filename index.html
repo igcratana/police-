@@ -271,7 +271,7 @@
         document.getElementById('deptForce').value = dept > 0 ? dept : 0;
     }
 
-    // បង្កើតអត្ថបទរបាយការណ៍ (បានសម្រួល Space ខាងដើមបន្ទាត់ចេញ)
+    // បង្កើតអត្ថបទរបាយការណ៍ (បានកែសម្រួលការចុះបន្ទាត់ត្រង់ឈ្មោះអ្នកទទួល)
     function generateReport() {
         const shift = document.getElementById('shiftTime').value;
         const timeText = document.getElementById('timeText').value;
@@ -284,7 +284,9 @@
 
         const reportTemplate = `🇰🇭.🚔ប្រចាំបញ្ជា វេនទី ២
 
-🙏សូមគោរពរាយការណ៍ជូន លោកឧត្តមសេនីយ៍ត្រី ${receiverName} ស្នងការនគរបាលខេត្តមណ្ឌលគិរី មេត្តាជូនជ្រាបដ៏ខ្ពង់ខ្ពស់។
+🙏សូមគោរពរាយការណ៍ជូន 
+លោកឧត្តមសេនីយ៍ត្រី ${receiverName} 
+ស្នងការនគរបាលខេត្តមណ្ឌលគិរី មេត្តាជូនជ្រាបដ៏ខ្ពង់ខ្ពស់។
 
 នា${shift} ${dateText}
 វេលាម៉ោង ${timeText}។
