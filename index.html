@@ -132,18 +132,20 @@
             background-color: #b7791f;
         }
 
-        /* Styling សម្រាប់ផ្នែក Upload/ថតរូប */
+        /* Styling សម្រាប់បង្ហាញរូបភាពច្រើនសន្លឹក Grid */
         .image-preview-container {
             margin-top: 10px;
-            text-align: center;
-            display: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
         }
-        .image-preview {
-            max-width: 100%;
-            max-height: 250px;
+        .image-preview-item {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
             border-radius: 8px;
             border: 1px solid #ddd;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         .toast {
@@ -256,13 +258,11 @@
 
     <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
 
-    <!-- ផ្នែកជ្រើសរើស ឬថតរូបភាព -->
+    <!-- ផ្នែកជ្រើសរើស ឬថតរូបភាពបានច្រើនសន្លឹក -->
     <div class="form-group">
-        <label for="imageInput">📷 ថតរូប ឬជ្រើសរើសរូបភាពភ្ជាប់ជាមួយរបាយការណ៍៖</label>
-        <input type="file" id="imageInput" accept="image/*" capture="environment" onchange="previewImage(event)">
-        <div id="imagePreviewContainer" class="image-preview-container">
-            <img id="imagePreview" class="image-preview" src="#" alt="រូបភាព preview">
-        </div>
+        <label for="imageInput">📷 ថតរូប ឬជ្រើសរើសរូបភាពភ្ជាប់ជាមួយរបាយការណ៍ (អាចជ្រើសបានច្រើនសន្លឹក)៖</label>
+        <input type="file" id="imageInput" accept="image/*" multiple onchange="previewImages(event)">
+        <div id="imagePreviewContainer" class="image-preview-container"></div>
     </div>
 
     <div class="form-group">
@@ -398,32 +398,35 @@
 វេលាម៉ោង ${timeText}។
 
 🇰🇭🚔.នៅស្នងការដ្ឋាននគរបាលខេត្ត បានប្រជុំជួរត្រួតពិនិត្យកម្លាំងប្រចាំបញ្ជា វេនទី (២B)វិលជុំ ៖
-🔹កម្លាំងមានមុខជាក់ស្ដែងសរុប ចំនួន ${totalForce}រូប ។
+🔹កម្លាំងមានមុខជាក់ស្ដែងសរុប ចំនួន ${totalForce}រូប ៖
 🔹ស្នងការរង ចំនួន ${deputyChief}រូប ៖
-🔹កម្លាំងការិ. សរុបចំនួន ${deptForce}រូប ។
+🔹កម្លាំងការិ. សរុបចំនួន ${deptForce}រូប ៖
 
 🙏អាស្រ័យហេតុនេះសូមគោរព ជូន
-លោកស្នងការ មេត្តាជ្រាប ដោយក្ដីគោរព ។
+លោកស្នងការ មេត្តាជ្រាប ដោយក្ដីគោរព ៖
 
 ឧត្តមសេនីយ៍ត្រី ${senderName}`;
 
         document.getElementById('reportOutput').value = reportTemplate;
     }
 
-    function previewImage(event) {
-        const input = event.target;
-        const preview = document.getElementById('imagePreview');
+    // អនុគមន៍ Preview រូបភាពច្រើនសន្លឹក
+    function previewImages(event) {
+        const files = event.target.files;
         const container = document.getElementById('imagePreviewContainer');
+        container.innerHTML = '';
 
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                container.style.display = 'block';
-            }
-            reader.readAsDataURL(input.files[0]);
-        } else {
-            container.style.display = 'none';
+        if (files && files.length > 0) {
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'image-preview-item';
+                    container.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            });
         }
     }
 
@@ -447,6 +450,7 @@
         }
     }
 
+    // អនុគមន៍ Share ទៅ Telegram ទាំងអត្ថបទ និងរូបភាពច្រើនសន្លឹក
     async function shareToTelegram() {
         const reportArea = document.getElementById('reportOutput');
         if (!reportArea.value) {
@@ -460,21 +464,22 @@
         }
 
         const imageInput = document.getElementById('imageInput');
+        const files = imageInput.files ? Array.from(imageInput.files) : [];
 
-        // ប្រសិនបើមានជ្រើសរើសរូបភាព និង Browser គាំទ្រការ Share ទាំងរូប និងអត្ថបទ (ភាគច្រើនលើ Mobile/Tablet)
-        if (imageInput.files && imageInput.files[0] && navigator.canShare && navigator.canShare({ files: [imageInput.files[0]] })) {
+        // ប្រសិនបើមានជ្រើសរើសរូបភាព និង Browser គាំទ្រការ Share រូបភាពច្រើន (លើ iOS Safari, Android Chrome)
+        if (files.length > 0 && navigator.canShare && navigator.canShare({ files: files })) {
             try {
                 await navigator.share({
                     text: reportText,
-                    files: [imageInput.files[0]]
+                    files: files
                 });
             } catch (err) {
-                // ប្រសិនបើអ្នកប្រើប្រាស់ cancel ឬមានបញ្ហា វានឹងបើកតាម Telegram URL ជំនួស
+                // ប្រសិនបើកាតព្វកិច្ច Share ត្រូវលុបចោល ឬមានបញ្ហា វានឹងបើក Telegram URL ជំនួស
                 const telegramUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(reportText)}`;
                 window.open(telegramUrl, '_blank');
             }
         } else {
-            // ប្រសិនបើគ្មានរូបភាព ឬបើកលើ PC Web វានឹងផ្ញើតែអត្ថបទរបាយការណ៍
+            // ប្រសិនបើគ្មានរូបភាព ឬនៅលើ Desktop Web វានឹងផ្ញើតែអត្ថបទរបាយការណ៍
             const telegramUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(reportText)}`;
             window.open(telegramUrl, '_blank');
         }
