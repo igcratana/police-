@@ -59,38 +59,6 @@
         .btn-copy:hover { background-color: #2f855a; }
         .btn-telegram { background-color: #0088cc; color: white; }
         .btn-telegram:hover { background-color: #006699; }
-        .btn-add-photo { background-color: #4a5568; color: white; display: inline-block; text-align: center; line-height: 20px; }
-        .btn-add-photo:hover { background-color: #2d3748; }
-
-        /* Styling រូបភាព និងប៊ូតុងបន្ថែម */
-        .image-preview-container {
-            margin-top: 12px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-        }
-        .image-preview-wrapper {
-            position: relative;
-            width: 90px;
-            height: 90px;
-        }
-        .image-preview-item {
-            width: 100%; height: 100%; object-fit: cover; border-radius: 8px;
-            border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .remove-img-btn {
-            position: absolute; top: -6px; right: -6px; background: #e53e3e;
-            color: white; border: none; border-radius: 50%; width: 22px; height: 22px;
-            font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;
-        }
-        .add-more-box {
-            width: 90px; height: 90px; border: 2px dashed #0088cc; border-radius: 8px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; background: #ebf8ff; color: #0088cc; font-weight: bold; font-size: 12px;
-            text-align: center; box-sizing: border-box;
-        }
-        .add-more-box span { font-size: 22px; line-height: 22px; }
 
         .toast {
             visibility: hidden; min-width: 250px; background-color: rgba(51, 51, 51, 0.95);
@@ -178,23 +146,6 @@
 
     <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
 
-    <!-- ផ្នែកជ្រើសរើស/ថតរូបភាព -->
-    <div class="form-group">
-        <label>📷 រូបភាពភ្ជាប់៖</label>
-        <!-- hidden file input -->
-        <input type="file" id="imageInput" accept="image/*" multiple style="display: none;" onchange="handleImageSelection(event)">
-        
-        <div class="image-preview-container">
-            <div id="imagePreviewContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
-            
-            <!-- ប៊ូតុង + ថត/ជ្រើសរូបថែម -->
-            <div class="add-more-box" onclick="triggerFileInput()">
-                <span>➕</span>
-                <div>ថត/បន្ថែម</div>
-            </div>
-        </div>
-    </div>
-
     <div class="form-group">
         <label for="reportOutput">លទ្ធផលរបាយការណ៍ (អាចកែប្រែបន្ថែមក្នុងប្រអប់នេះបាន)៖</label>
         <textarea id="reportOutput"></textarea>
@@ -202,8 +153,7 @@
 
     <div class="btn-group">
         <button class="btn-copy" onclick="copyReport()">📋 ចម្លង (Copy)</button>
-        <button class="btn-telegram" onclick="shareTextOnlyToTelegram()">✈️ ផ្ញើតែអត្ថបទ (កែក្នុង Telegram បាន)</button>
-        <button class="btn-telegram" style="background-color: #005580;" onclick="shareToTelegramWithFiles()">🖼️ ផ្ញើទាំងអត្ថបទ+រូបភាព</button>
+        <button class="btn-telegram" onclick="shareTextOnlyToTelegram()">✈️ ផ្ញើទៅ Telegram (កែបាន)</button>
     </div>
 
     <div class="app-license">
@@ -303,53 +253,6 @@
         document.getElementById('reportOutput').value = reportTemplate;
     }
 
-    // រក្សារូបភាព
-    let selectedImageFiles = [];
-
-    function triggerFileInput() {
-        document.getElementById('imageInput').click();
-    }
-
-    function handleImageSelection(event) {
-        const newFiles = Array.from(event.target.files);
-        if (newFiles.length > 0) {
-            selectedImageFiles = selectedImageFiles.concat(newFiles);
-            renderImagePreviews();
-        }
-        event.target.value = '';
-    }
-
-    function renderImagePreviews() {
-        const container = document.getElementById('imagePreviewContainer');
-        container.innerHTML = '';
-
-        selectedImageFiles.forEach((file, index) => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'image-preview-wrapper';
-
-            const img = document.createElement('img');
-            img.src = URL.createObjectURL(file);
-            img.className = 'image-preview-item';
-
-            const removeBtn = document.createElement('button');
-            removeBtn.className = 'remove-img-btn';
-            removeBtn.innerHTML = '✕';
-            removeBtn.onclick = function(e) {
-                e.stopPropagation();
-                removeImage(index);
-            };
-
-            wrapper.appendChild(img);
-            wrapper.appendChild(removeBtn);
-            container.appendChild(wrapper);
-        });
-    }
-
-    function removeImage(index) {
-        selectedImageFiles.splice(index, 1);
-        renderImagePreviews();
-    }
-
     function copyReport() {
         const reportArea = document.getElementById('reportOutput');
         if (!reportArea.value) generateReport();
@@ -364,7 +267,6 @@
         }
     }
 
-    // 1. ផ្ញើតែអត្ថបទ (អាចកែប្រែក្នុង Telegram បាន ១០០%)
     function shareTextOnlyToTelegram() {
         const reportText = document.getElementById('reportOutput').value;
         if (!reportText.trim()) {
@@ -373,28 +275,6 @@
         }
         const telegramUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(reportText)}`;
         window.open(telegramUrl, '_blank');
-    }
-
-    // 2. ផ្ញើអត្ថបទ + រូបភាព (ទាមទារ Share Sheet)
-    async function shareToTelegramWithFiles() {
-        const reportText = document.getElementById('reportOutput').value;
-        if (!reportText.trim()) {
-            alert("សូមបង្កើតរបាយការណ៍ជាមុនសិន!");
-            return;
-        }
-
-        if (selectedImageFiles.length > 0 && navigator.canShare && navigator.canShare({ files: selectedImageFiles })) {
-            try {
-                await navigator.share({
-                    text: reportText,
-                    files: selectedImageFiles
-                });
-            } catch (err) {
-                shareTextOnlyToTelegram();
-            }
-        } else {
-            shareTextOnlyToTelegram();
-        }
     }
 
     function showToast() {
