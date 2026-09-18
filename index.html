@@ -53,6 +53,8 @@
             font-size: 15px; font-weight: bold; cursor: pointer; transition: background 0.2s;
             min-width: 140px;
         }
+        .btn-weather { background-color: #dd6b20; color: white; }
+        .btn-weather:hover { background-color: #c05621; }
         .btn-generate { background-color: #2b6cb0; color: white; }
         .btn-generate:hover { background-color: #2c5282; }
         .btn-copy { background-color: #38a169; color: white; }
@@ -140,7 +142,8 @@
         </div>
     </div>
 
-    <div class="btn-group">
+    <div class="btn-group" style="flex-direction: column;">
+        <button class="btn-weather" onclick="generateWeatherReport()">🌧️ លក្ខណអាកាសធាតុ</button>
         <button class="btn-generate" onclick="generateReport()">បង្កើតរបាយការណ៍</button>
     </div>
 
@@ -244,6 +247,32 @@
 🔹កម្លាំងមានមុខជាក់ស្ដែងសរុប ចំនួន ${totalForce}រូប ៖
 🔹ស្នងការរង ចំនួន ${deputyChief}រូប ៖
 🔹កម្លាំងការិ. សរុបចំនួន ${deptForce}រូប ៖
+
+🙏អាស្រ័យហេតុនេះសូមគោរព ជូន
+លោកស្នងការ មេត្តាជ្រាប ដោយក្ដីគោរព ៖
+
+ឧត្តមសេនីយ៍ត្រី ${senderName}`;
+
+        document.getElementById('reportOutput').value = reportTemplate;
+    }
+
+    function generateWeatherReport() {
+        const shift = document.getElementById('shiftTime').value;
+        const timeText = document.getElementById('timeText').value;
+        const dateText = document.getElementById('dateText').value;
+        const receiverName = document.getElementById('receiverName').value;
+        const senderName = document.getElementById('senderName').value;
+
+        const reportTemplate = `🇰🇭.🚔ប្រចាំបញ្ជា វេនទី ២
+
+🙏សូមគោរពរាយការណ៍ជូន 
+លោកឧត្តមសេនីយ៍ត្រី ${receiverName} 
+ស្នងការនគរបាលខេត្តមណ្ឌលគិរី មេត្តាជូនជ្រាបដ៏ខ្ពង់ខ្ពស់។
+
+នា${shift} ${dateText}
+វេលាម៉ោង ${timeText}។
+
+🇰🇭🚔.នៅស្នងការដ្ឋាននគរបាលខេត្ត មិនបានប្រជុំជួរត្រួតពិនិត្យកម្លាំងប្រចាំបញ្ជាទេ មូលហេតុដោយសារអាកាសធាតុមិនអំណោយផល ។
 
 🙏អាស្រ័យហេតុនេះសូមគោរព ជូន
 លោកស្នងការ មេត្តាជ្រាប ដោយក្ដីគោរព ៖
