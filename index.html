@@ -81,7 +81,7 @@
             margin-bottom: 15px;
         }
         textarea {
-            height: 220px !important;
+            height: 200px !important;
             resize: vertical;
             background-color: #fcfcfc;
             line-height: 1.6;
@@ -130,6 +130,20 @@
         }
         .btn-install:hover {
             background-color: #b7791f;
+        }
+
+        /* Styling សម្រាប់ផ្នែក Upload/ថតរូប */
+        .image-preview-container {
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
 
         .toast {
@@ -241,6 +255,15 @@
     </div>
 
     <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+    <!-- ផ្នែកជ្រើសរើស ឬថតរូបភាព -->
+    <div class="form-group">
+        <label for="imageInput">📷 ថតរូប ឬជ្រើសរើសរូបភាពភ្ជាប់ជាមួយរបាយការណ៍៖</label>
+        <input type="file" id="imageInput" accept="image/*" capture="environment" onchange="previewImage(event)">
+        <div id="imagePreviewContainer" class="image-preview-container">
+            <img id="imagePreview" class="image-preview" src="#" alt="រូបភាព preview">
+        </div>
+    </div>
 
     <div class="form-group">
         <label for="reportOutput">លទ្ធផលរបាយការណ៍ (អាចកែប្រែបន្ថែមក្នុងប្រអប់នេះបាន)៖</label>
@@ -387,6 +410,23 @@
         document.getElementById('reportOutput').value = reportTemplate;
     }
 
+    function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById('imagePreview');
+        const container = document.getElementById('imagePreviewContainer');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                container.style.display = 'block';
+            }
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            container.style.display = 'none';
+        }
+    }
+
     function copyReport() {
         const reportArea = document.getElementById('reportOutput');
         if (!reportArea.value) {
@@ -407,7 +447,7 @@
         }
     }
 
-    function shareToTelegram() {
+    async function shareToTelegram() {
         const reportArea = document.getElementById('reportOutput');
         if (!reportArea.value) {
             generateReport();
@@ -419,8 +459,25 @@
             return;
         }
 
-        const telegramUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(reportText)}`;
-        window.open(telegramUrl, '_blank');
+        const imageInput = document.getElementById('imageInput');
+
+        // ប្រសិនបើមានជ្រើសរើសរូបភាព និង Browser គាំទ្រការ Share ទាំងរូប និងអត្ថបទ (ភាគច្រើនលើ Mobile/Tablet)
+        if (imageInput.files && imageInput.files[0] && navigator.canShare && navigator.canShare({ files: [imageInput.files[0]] })) {
+            try {
+                await navigator.share({
+                    text: reportText,
+                    files: [imageInput.files[0]]
+                });
+            } catch (err) {
+                // ប្រសិនបើអ្នកប្រើប្រាស់ cancel ឬមានបញ្ហា វានឹងបើកតាម Telegram URL ជំនួស
+                const telegramUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(reportText)}`;
+                window.open(telegramUrl, '_blank');
+            }
+        } else {
+            // ប្រសិនបើគ្មានរូបភាព ឬបើកលើ PC Web វានឹងផ្ញើតែអត្ថបទរបាយការណ៍
+            const telegramUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(reportText)}`;
+            window.open(telegramUrl, '_blank');
+        }
     }
 
     function showToast() {
