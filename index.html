@@ -115,6 +115,13 @@
         .btn-copy:hover {
             background-color: #2f855a;
         }
+        .btn-telegram {
+            background-color: #0088cc;
+            color: white;
+        }
+        .btn-telegram:hover {
+            background-color: #006699;
+        }
         .btn-install {
             background-color: #d69e2e;
             color: white;
@@ -242,6 +249,7 @@
 
     <div class="btn-group">
         <button class="btn-copy" onclick="copyReport()">📋 ចម្លង (Copy) របាយការណ៍</button>
+        <button class="btn-telegram" onclick="shareToTelegram()">✈️ ផ្ញើទៅ Telegram</button>
     </div>
 
     <div class="app-license">
@@ -397,6 +405,22 @@
         } catch (err) {
             alert("សូមជ្រើសរើសអត្ថបទ និងចុច Copy ដោយផ្ទាល់!");
         }
+    }
+
+    function shareToTelegram() {
+        const reportArea = document.getElementById('reportOutput');
+        if (!reportArea.value) {
+            generateReport();
+        }
+        
+        const reportText = reportArea.value;
+        if (!reportText.trim()) {
+            alert("សូមបង្កើតរបាយការណ៍ជាមុនសិន!");
+            return;
+        }
+
+        const telegramUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(reportText)}`;
+        window.open(telegramUrl, '_blank');
     }
 
     function showToast() {
