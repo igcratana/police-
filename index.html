@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>កម្មវិធីបង្កើតរបាយការណ៍ប្រចាំបញ្ជា</title>
     
-    <!-- PWA Settings សម្រាប់កំណត់ឱ្យវាដំណើរការជា App -->
     <meta name="theme-color" content="#1a365d">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,10 +12,7 @@
     <link rel="apple-touch-icon" href="image1.jpg">
     <link rel="icon" type="image/jpeg" href="image1.jpg">
     
-    <!-- Web App Manifest Dynamic Data -->
     <link rel="manifest" id="manifestPlaceholder">
-
-    <!-- ទាញយកបណ្ណាល័យ momentkh សម្រាប់គណនាថ្ងៃចន្ទគតិខ្មែរ -->
     <script src="https://cdn.jsdelivr.net/gh/ThyrithSor/momentkh@3.0.3/momentkh.js"></script>
     
     <style>
@@ -35,174 +31,77 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .app-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+        .app-header { text-align: center; margin-bottom: 20px; }
         .app-logo {
-            width: 110px;
-            height: 110px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            width: 110px; height: 110px; object-fit: cover; border-radius: 50%;
+            margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
-        h2 {
-            text-align: center;
-            color: #1a365d;
-            margin: 0 0 20px 0;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            font-size: 14px;
-        }
+        h2 { text-align: center; color: #1a365d; margin: 0 0 20px 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
         select, input[type="text"], input[type="number"], input[type="date"], textarea {
-            width: 100%;
-            height: 42px;
-            padding: 8px 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 15px;
-            font-family: inherit;
+            width: 100%; height: 42px; padding: 8px 10px; border: 1px solid #ccc;
+            border-radius: 6px; box-sizing: border-box; font-size: 15px; font-family: inherit;
         }
-        .row {
-            display: flex;
-            gap: 12px;
-            align-items: flex-end;
-        }
-        .row .form-group {
-            flex: 1;
-            margin-bottom: 15px;
-        }
-        textarea {
-            height: 200px !important;
-            resize: vertical;
-            background-color: #fcfcfc;
-            line-height: 1.6;
-        }
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
+        .row { display: flex; gap: 12px; align-items: flex-end; }
+        .row .form-group { flex: 1; margin-bottom: 15px; }
+        textarea { height: 180px !important; resize: vertical; background-color: #fcfcfc; line-height: 1.6; }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
         button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
+            flex: 1; padding: 12px; border: none; border-radius: 6px;
+            font-size: 15px; font-weight: bold; cursor: pointer; transition: background 0.2s;
+            min-width: 140px;
         }
-        .btn-generate {
-            background-color: #2b6cb0;
-            color: white;
-        }
-        .btn-generate:hover {
-            background-color: #2c5282;
-        }
-        .btn-copy {
-            background-color: #38a169;
-            color: white;
-        }
-        .btn-copy:hover {
-            background-color: #2f855a;
-        }
-        .btn-telegram {
-            background-color: #0088cc;
-            color: white;
-        }
-        .btn-telegram:hover {
-            background-color: #006699;
-        }
-        .btn-install {
-            background-color: #d69e2e;
-            color: white;
-            display: none;
-            margin-bottom: 15px;
-        }
-        .btn-install:hover {
-            background-color: #b7791f;
-        }
+        .btn-generate { background-color: #2b6cb0; color: white; }
+        .btn-generate:hover { background-color: #2c5282; }
+        .btn-copy { background-color: #38a169; color: white; }
+        .btn-copy:hover { background-color: #2f855a; }
+        .btn-telegram { background-color: #0088cc; color: white; }
+        .btn-telegram:hover { background-color: #006699; }
+        .btn-add-photo { background-color: #4a5568; color: white; display: inline-block; text-align: center; line-height: 20px; }
+        .btn-add-photo:hover { background-color: #2d3748; }
 
-        /* Styling សម្រាប់បង្ហាញរូបភាពច្រើនសន្លឹក និងប៊ូតុងលុប */
+        /* Styling រូបភាព និងប៊ូតុងបន្ថែម */
         .image-preview-container {
             margin-top: 12px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
             gap: 10px;
+            align-items: center;
         }
         .image-preview-wrapper {
             position: relative;
-            width: 100%;
-            height: 100px;
+            width: 90px;
+            height: 90px;
         }
         .image-preview-item {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 100%; height: 100%; object-fit: cover; border-radius: 8px;
+            border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .remove-img-btn {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            background: #e53e3e;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 22px;
-            height: 22px;
-            font-size: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: absolute; top: -6px; right: -6px; background: #e53e3e;
+            color: white; border: none; border-radius: 50%; width: 22px; height: 22px;
+            font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;
         }
+        .add-more-box {
+            width: 90px; height: 90px; border: 2px dashed #0088cc; border-radius: 8px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; background: #ebf8ff; color: #0088cc; font-weight: bold; font-size: 12px;
+            text-align: center; box-sizing: border-box;
+        }
+        .add-more-box span { font-size: 22px; line-height: 22px; }
 
         .toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: rgba(51, 51, 51, 0.95);
-            color: #fff;
-            text-align: center;
-            border-radius: 8px;
-            padding: 16px 24px;
-            font-size: 16px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
+            visibility: hidden; min-width: 250px; background-color: rgba(51, 51, 51, 0.95);
+            color: #fff; text-align: center; border-radius: 8px; padding: 16px 24px;
+            font-size: 16px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;
         }
-        .toast.show {
-            visibility: visible;
-            animation: fadeInOut 3s forwards;
-        }
+        .toast.show { visibility: visible; animation: fadeInOut 3s forwards; }
 
         .app-license {
-            margin-top: 25px;
-            padding-top: 15px;
-            border-top: 1px dashed #cbd5e0;
-            text-align: center;
-            font-size: 13px;
-            color: #4a5568;
-            line-height: 1.6;
-        }
-        .app-license strong {
-            color: #1a365d;
+            margin-top: 25px; padding-top: 15px; border-top: 1px dashed #cbd5e0;
+            text-align: center; font-size: 13px; color: #4a5568;
         }
 
         @keyframes fadeInOut {
@@ -216,8 +115,6 @@
 <body>
 
 <div class="container">
-    <button id="installBtn" class="btn-install" onclick="installApp()">📲 ដំឡើងកម្មវិធីនេះលើទូរស័ព្ទ/កុំព្យូទ័រ (Install App)</button>
-
     <div class="app-header">
         <img src="image1.jpg" alt="App Logo" class="app-logo">
         <h2>📝 កម្មវិធីបង្កើតរបាយការណ៍ប្រចាំបញ្ជា</h2>
@@ -281,11 +178,21 @@
 
     <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
 
-    <!-- ផ្នែកជ្រើសរើស ឬថតរូបភាពបានច្រើនសន្លឹក -->
+    <!-- ផ្នែកជ្រើសរើស/ថតរូបភាព -->
     <div class="form-group">
-        <label for="imageInput">📷 ថតរូប ឬជ្រើសរើសរូបភាព (អាចជ្រើសរើស ឬថតថែមច្រើនដងបាន)៖</label>
-        <input type="file" id="imageInput" accept="image/*" multiple onchange="handleImageSelection(event)">
-        <div id="imagePreviewContainer" class="image-preview-container"></div>
+        <label>📷 រូបភាពភ្ជាប់៖</label>
+        <!-- hidden file input -->
+        <input type="file" id="imageInput" accept="image/*" multiple style="display: none;" onchange="handleImageSelection(event)">
+        
+        <div class="image-preview-container">
+            <div id="imagePreviewContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+            
+            <!-- ប៊ូតុង + ថត/ជ្រើសរូបថែម -->
+            <div class="add-more-box" onclick="triggerFileInput()">
+                <span>➕</span>
+                <div>ថត/បន្ថែម</div>
+            </div>
+        </div>
     </div>
 
     <div class="form-group">
@@ -294,8 +201,9 @@
     </div>
 
     <div class="btn-group">
-        <button class="btn-copy" onclick="copyReport()">📋 ចម្លង (Copy) របាយការណ៍</button>
-        <button class="btn-telegram" onclick="shareToTelegram()">✈️ ផ្ញើទៅ Telegram</button>
+        <button class="btn-copy" onclick="copyReport()">📋 ចម្លង (Copy)</button>
+        <button class="btn-telegram" onclick="shareTextOnlyToTelegram()">✈️ ផ្ញើតែអត្ថបទ (កែក្នុង Telegram បាន)</button>
+        <button class="btn-telegram" style="background-color: #005580;" onclick="shareToTelegramWithFiles()">🖼️ ផ្ញើទាំងអត្ថបទ+រូបភាព</button>
     </div>
 
     <div class="app-license">
@@ -306,44 +214,6 @@
 <div id="toast" class="toast">បានចម្លងរបាយការណ៍រួចរាល់!</div>
 
 <script>
-    // បង្កើត Manifest Dynamic
-    const manifestData = {
-        "name": "កម្មវិធីបង្កើតរបាយការណ៍ប្រចាំបញ្ជា",
-        "short_name": "របាយការណ៍",
-        "start_url": ".",
-        "display": "standalone",
-        "background_color": "#ffffff",
-        "theme_color": "#1a365d",
-        "icons": [{
-            "src": "image1.jpg",
-            "sizes": "192x192 512x512",
-            "type": "image/jpeg"
-        }]
-    };
-    const stringManifest = JSON.stringify(manifestData);
-    const blob = new Blob([stringManifest], {type: 'application/json'});
-    const manifestURL = URL.createObjectURL(blob);
-    document.getElementById('manifestPlaceholder').setAttribute('href', manifestURL);
-
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        document.getElementById('installBtn').style.display = 'block';
-    });
-
-    function installApp() {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    document.getElementById('installBtn').style.display = 'none';
-                }
-                deferredPrompt = null;
-            });
-        }
-    }
-
     const khmerMonths = ["មករា", "កុម្ភៈ", "មីនា", "មេសា", "ឧសភា", "មិថុនា", "កក្កដា", "សីហា", "កញ្ញា", "តុលា", "វិច្ឆិកា", "ធ្នូ"];
     const khmerNumbers = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
 
@@ -433,17 +303,19 @@
         document.getElementById('reportOutput').value = reportTemplate;
     }
 
-    // អារ៉េសម្រាប់រក្សារូបភាពទាំងអស់មិនឱ្យបាត់ពេលជ្រើសរើស/ថតបន្ថែម
+    // រក្សារូបភាព
     let selectedImageFiles = [];
+
+    function triggerFileInput() {
+        document.getElementById('imageInput').click();
+    }
 
     function handleImageSelection(event) {
         const newFiles = Array.from(event.target.files);
         if (newFiles.length > 0) {
-            // បន្ថែមរូបភាពថ្មីចូលក្នុង Array
             selectedImageFiles = selectedImageFiles.concat(newFiles);
             renderImagePreviews();
         }
-        // Reset input value ដើម្បីឱ្យអាចជ្រើសរើស/ថតរូបដដែលៗបន្ថែមទៀតបាន
         event.target.value = '';
     }
 
@@ -462,7 +334,8 @@
             const removeBtn = document.createElement('button');
             removeBtn.className = 'remove-img-btn';
             removeBtn.innerHTML = '✕';
-            removeBtn.onclick = function() {
+            removeBtn.onclick = function(e) {
+                e.stopPropagation();
                 removeImage(index);
             };
 
@@ -479,37 +352,37 @@
 
     function copyReport() {
         const reportArea = document.getElementById('reportOutput');
-        if (!reportArea.value) {
-            generateReport();
-        }
+        if (!reportArea.value) generateReport();
         reportArea.select();
         reportArea.setSelectionRange(0, 99999);
 
         try {
-            const successful = document.execCommand('copy');
-            if (successful) {
-                showToast();
-            } else {
-                alert("មិនអាច Copy បានទេ សូមជ្រើសរើសអត្ថបទហើយ Copy ដោយផ្ទាល់!");
-            }
+            document.execCommand('copy');
+            showToast();
         } catch (err) {
             alert("សូមជ្រើសរើសអត្ថបទ និងចុច Copy ដោយផ្ទាល់!");
         }
     }
 
-    async function shareToTelegram() {
-        const reportArea = document.getElementById('reportOutput');
-        if (!reportArea.value) {
-            generateReport();
+    // 1. ផ្ញើតែអត្ថបទ (អាចកែប្រែក្នុង Telegram បាន ១០០%)
+    function shareTextOnlyToTelegram() {
+        const reportText = document.getElementById('reportOutput').value;
+        if (!reportText.trim()) {
+            alert("សូមបង្កើតរបាយការណ៍ជាមុនសិន!");
+            return;
         }
-        
-        const reportText = reportArea.value;
+        const telegramUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(reportText)}`;
+        window.open(telegramUrl, '_blank');
+    }
+
+    // 2. ផ្ញើអត្ថបទ + រូបភាព (ទាមទារ Share Sheet)
+    async function shareToTelegramWithFiles() {
+        const reportText = document.getElementById('reportOutput').value;
         if (!reportText.trim()) {
             alert("សូមបង្កើតរបាយការណ៍ជាមុនសិន!");
             return;
         }
 
-        // ប្រើប្រាស់ Array selectedImageFiles ដែលបានរក្សាទុក
         if (selectedImageFiles.length > 0 && navigator.canShare && navigator.canShare({ files: selectedImageFiles })) {
             try {
                 await navigator.share({
@@ -517,12 +390,10 @@
                     files: selectedImageFiles
                 });
             } catch (err) {
-                const telegramUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(reportText)}`;
-                window.open(telegramUrl, '_blank');
+                shareTextOnlyToTelegram();
             }
         } else {
-            const telegramUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(reportText)}`;
-            window.open(telegramUrl, '_blank');
+            shareTextOnlyToTelegram();
         }
     }
 
