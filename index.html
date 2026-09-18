@@ -132,20 +132,43 @@
             background-color: #b7791f;
         }
 
-        /* Styling សម្រាប់បង្ហាញរូបភាពច្រើនសន្លឹក Grid */
+        /* Styling សម្រាប់បង្ហាញរូបភាពច្រើនសន្លឹក និងប៊ូតុងលុប */
         .image-preview-container {
-            margin-top: 10px;
+            margin-top: 12px;
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             gap: 10px;
         }
-        .image-preview-item {
+        .image-preview-wrapper {
+            position: relative;
             width: 100%;
             height: 100px;
+        }
+        .image-preview-item {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             border-radius: 8px;
             border: 1px solid #ddd;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .remove-img-btn {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .toast {
@@ -260,8 +283,8 @@
 
     <!-- ផ្នែកជ្រើសរើស ឬថតរូបភាពបានច្រើនសន្លឹក -->
     <div class="form-group">
-        <label for="imageInput">📷 ថតរូប ឬជ្រើសរើសរូបភាពភ្ជាប់ជាមួយរបាយការណ៍ (អាចជ្រើសបានច្រើនសន្លឹក)៖</label>
-        <input type="file" id="imageInput" accept="image/*" multiple onchange="previewImages(event)">
+        <label for="imageInput">📷 ថតរូប ឬជ្រើសរើសរូបភាព (អាចជ្រើសរើស ឬថតថែមច្រើនដងបាន)៖</label>
+        <input type="file" id="imageInput" accept="image/*" multiple onchange="handleImageSelection(event)">
         <div id="imagePreviewContainer" class="image-preview-container"></div>
     </div>
 
@@ -283,7 +306,7 @@
 <div id="toast" class="toast">បានចម្លងរបាយការណ៍រួចរាល់!</div>
 
 <script>
-    // បង្កើត Manifest Dynamic ដើម្បីអោយ Browser ស្គាល់ថាជា App
+    // បង្កើត Manifest Dynamic
     const manifestData = {
         "name": "កម្មវិធីបង្កើតរបាយការណ៍ប្រចាំបញ្ជា",
         "short_name": "របាយការណ៍",
@@ -410,24 +433,48 @@
         document.getElementById('reportOutput').value = reportTemplate;
     }
 
-    // អនុគមន៍ Preview រូបភាពច្រើនសន្លឹក
-    function previewImages(event) {
-        const files = event.target.files;
+    // អារ៉េសម្រាប់រក្សារូបភាពទាំងអស់មិនឱ្យបាត់ពេលជ្រើសរើស/ថតបន្ថែម
+    let selectedImageFiles = [];
+
+    function handleImageSelection(event) {
+        const newFiles = Array.from(event.target.files);
+        if (newFiles.length > 0) {
+            // បន្ថែមរូបភាពថ្មីចូលក្នុង Array
+            selectedImageFiles = selectedImageFiles.concat(newFiles);
+            renderImagePreviews();
+        }
+        // Reset input value ដើម្បីឱ្យអាចជ្រើសរើស/ថតរូបដដែលៗបន្ថែមទៀតបាន
+        event.target.value = '';
+    }
+
+    function renderImagePreviews() {
         const container = document.getElementById('imagePreviewContainer');
         container.innerHTML = '';
 
-        if (files && files.length > 0) {
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'image-preview-item';
-                    container.appendChild(img);
-                }
-                reader.readAsDataURL(file);
-            });
-        }
+        selectedImageFiles.forEach((file, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'image-preview-wrapper';
+
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.className = 'image-preview-item';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-img-btn';
+            removeBtn.innerHTML = '✕';
+            removeBtn.onclick = function() {
+                removeImage(index);
+            };
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(removeBtn);
+            container.appendChild(wrapper);
+        });
+    }
+
+    function removeImage(index) {
+        selectedImageFiles.splice(index, 1);
+        renderImagePreviews();
     }
 
     function copyReport() {
@@ -450,7 +497,6 @@
         }
     }
 
-    // អនុគមន៍ Share ទៅ Telegram ទាំងអត្ថបទ និងរូបភាពច្រើនសន្លឹក
     async function shareToTelegram() {
         const reportArea = document.getElementById('reportOutput');
         if (!reportArea.value) {
@@ -463,23 +509,18 @@
             return;
         }
 
-        const imageInput = document.getElementById('imageInput');
-        const files = imageInput.files ? Array.from(imageInput.files) : [];
-
-        // ប្រសិនបើមានជ្រើសរើសរូបភាព និង Browser គាំទ្រការ Share រូបភាពច្រើន (លើ iOS Safari, Android Chrome)
-        if (files.length > 0 && navigator.canShare && navigator.canShare({ files: files })) {
+        // ប្រើប្រាស់ Array selectedImageFiles ដែលបានរក្សាទុក
+        if (selectedImageFiles.length > 0 && navigator.canShare && navigator.canShare({ files: selectedImageFiles })) {
             try {
                 await navigator.share({
                     text: reportText,
-                    files: files
+                    files: selectedImageFiles
                 });
             } catch (err) {
-                // ប្រសិនបើកាតព្វកិច្ច Share ត្រូវលុបចោល ឬមានបញ្ហា វានឹងបើក Telegram URL ជំនួស
                 const telegramUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(reportText)}`;
                 window.open(telegramUrl, '_blank');
             }
         } else {
-            // ប្រសិនបើគ្មានរូបភាព ឬនៅលើ Desktop Web វានឹងផ្ញើតែអត្ថបទរបាយការណ៍
             const telegramUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(reportText)}`;
             window.open(telegramUrl, '_blank');
         }
